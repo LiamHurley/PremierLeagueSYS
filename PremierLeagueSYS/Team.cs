@@ -26,7 +26,7 @@ namespace PremierLeagueSYS
         public int goalsFor { get; set; }
         public int goalsAgainst { get; set; }
         public int goalDifference { get; set; }
-        OracleConnection conn = new OracleConnection(DBConnect.oraDB);
+        private OracleConnection conn = new OracleConnection(DBConnect.oraDB);
 
         public Team()
         {
@@ -49,13 +49,14 @@ namespace PremierLeagueSYS
 
         public static bool teamExists(String teamName)
         {
-            String sql = "SELECT * FROM TEAMS WHERE NAME = '" + teamName + "'";
+            String sql = "SELECT * FROM TEAMS WHERE LOWER(NAME) = :name";
 
             OracleConnection conn = new OracleConnection(DBConnect.oraDB);
 
             conn.Open();
 
             OracleCommand cmd = new OracleCommand(sql, conn);
+            cmd.Parameters.Add(":name", teamName);
 
             OracleDataReader dr = cmd.ExecuteReader();
 
@@ -73,13 +74,14 @@ namespace PremierLeagueSYS
 
         public static bool managerExists(String manager)
         {
-            String sql = "SELECT * FROM TEAMS WHERE MANAGER = '" + manager + "'";
+            String sql = "SELECT * FROM TEAMS WHERE LOWER(MANAGER) = :manager";
 
             OracleConnection conn = new OracleConnection(DBConnect.oraDB);
 
             conn.Open();
 
             OracleCommand cmd = new OracleCommand(sql, conn);
+            cmd.Parameters.Add(":manager", manager);
 
             OracleDataReader dr = cmd.ExecuteReader();
 
@@ -107,11 +109,9 @@ namespace PremierLeagueSYS
 
             OracleDataAdapter da = new OracleDataAdapter(cmd);
 
-            DataSet ds = new DataSet();
+            DataTable dt = new DataTable();
 
-            da.Fill(ds, "Teams");
-
-            DataTable dt = ds.Tables["Teams"];
+            da.Fill(dt);
 
             conn.Close();
 
@@ -163,13 +163,11 @@ namespace PremierLeagueSYS
             return Int32.Parse(dt.Rows[0]["MAX(TEAM_ID)"].ToString())+1;
         }
 
-        public void getTeam(int id)
+        public void getTeamInfo(int id)
         {
             this.id = id;
 
             String sql = "SELECT * FROM TEAMS WHERE TEAM_ID=:id";
-
-            OracleConnection conn = new OracleConnection(DBConnect.oraDB);
 
             conn.Open();
 
@@ -189,7 +187,7 @@ namespace PremierLeagueSYS
             conn.Close();
         }
         
-        public static DataTable getTeams()
+        public static DataTable loadTeams()
         {
             String sql = "SELECT * FROM TEAMS ORDER BY NAME ASC";
 
@@ -210,11 +208,20 @@ namespace PremierLeagueSYS
             return dt;
         }
 
-        public static void removeTeam(String name)
+        //loads Team objects into supplied ComboBox
+        public static void loadTeams(ComboBox cbo)
         {
-            String sql = "DELETE FROM TEAMS WHERE NAME = '" + name + "'";
+            DataTable teamsList = Team.loadTeams(); 
+            
+            for (int i = 0; i < teamsList.Rows.Count; i++)
+            {
+                cbo.Items.Add(Convert.ToInt32(teamsList.Rows[i]["TEAM_ID"]).ToString("000") + " - " + teamsList.Rows[i]["NAME"].ToString());
+            }
+        }
 
-            OracleConnection conn = new OracleConnection(DBConnect.oraDB);
+        public void removeTeam()
+        {
+            String sql = "DELETE FROM TEAMS WHERE TEAM_ID = '" + this.id + "'";
 
             OracleCommand cmd = new OracleCommand(sql, conn);
 
@@ -222,7 +229,7 @@ namespace PremierLeagueSYS
 
             cmd.ExecuteNonQuery();
 
-            MessageBox.Show("You have successfully removed " + name + " from the Premier League!");
+            MessageBox.Show("You have successfully removed " + this.name + " from the Premier League!");
 
             conn.Close();
         }
@@ -230,8 +237,6 @@ namespace PremierLeagueSYS
         public void updateTeam()
         {
             String sql = "UPDATE TEAMS SET MANAGER=:manager, STADIUM=:stadium,STADIUM_CAPACITY=:capacity,LOCATION=:location WHERE TEAM_ID =:id";
-
-            OracleConnection conn = new OracleConnection(DBConnect.oraDB);
 
             conn.Open();
 
@@ -248,7 +253,7 @@ namespace PremierLeagueSYS
             conn.Close();
         }
 
-        public static DataTable generateProfile(int id)
+        public static DataTable getProfileStats(int id)
         {
             //learned how to execute multiple counts in one query here https://stackoverflow.com/questions/12789396/how-to-get-multiple-counts-with-one-sql-query
 
@@ -309,7 +314,7 @@ namespace PremierLeagueSYS
             return id;
         }
 
-        // NOTE - CONDENSE NEXT 2/3 METHODS INTO 1/2 USING IF STATEMENTS TO SELECT SQL QUERY BASED ON MATCH OUTCOME???
+        // NOTE - Expand following few methods?
         
         public static void homeWin(int id)
         {
@@ -466,7 +471,7 @@ namespace PremierLeagueSYS
         public static DataTable generateTable()
         {
             String sql = "SELECT NAME, COALESCE(PLAYED,0) as P, COALESCE(WON,0) as W, COALESCE(DRAWN,0) as D, COALESCE(LOST,0) as L, COALESCE(GOALS_FOR,0) as GF, " +
-                         "COALESCE(GOALS_AGAINST,0) as GA, COALESCE(GOAL_DIFFERENCE,0) as GD, COALESCE(POINTS,0) as Pts FROM TEAMS ORDER BY Pts DESC, GD DESC, GF DESC";
+                         "COALESCE(GOALS_AGAINST,0) as GA, COALESCE(GOAL_DIFFERENCE,0) as GD, COALESCE(POINTS,0) as Pts FROM TEAMS ORDER BY Pts DESC, GD DESC, GF DESC, NAME ASC";
 
             OracleConnection conn = new OracleConnection(DBConnect.oraDB);
 
@@ -511,7 +516,7 @@ namespace PremierLeagueSYS
 
         public static bool isSeasonComplete()
         {
-            String sql = "SELECT SUM(PLAYED) as Total FROM TEAMS";
+            String sql = "SELECT PLAYED FROM TEAMS";
 
             OracleConnection conn = new OracleConnection(DBConnect.oraDB);
 
@@ -527,9 +532,10 @@ namespace PremierLeagueSYS
 
             conn.Close();
 
-            if(Convert.ToInt32(dt.Rows[0]["Total"])!=760)
+            for(int i=0; i<dt.Rows.Count; i++)
             {
-                return false;
+                if (Convert.ToInt32(dt.Rows[i]["PLAYED"]) != 10)
+                    return false;
             }
 
             return true;
@@ -550,10 +556,12 @@ namespace PremierLeagueSYS
             conn.Close();
         }
 
+        //Method to sort league Table to determine who to relegate
+        //different to generateTable() as this method also selects TeamID so they can be renumbered in new season module.
         public static DataTable sortTable()
         {
             String sql = "SELECT TEAM_ID, NAME, COALESCE(PLAYED,0) as P, COALESCE(WON,0) as W, COALESCE(DRAWN,0) as D, COALESCE(LOST,0) as L, COALESCE(GOALS_FOR,0) as GF, " +
-                           "COALESCE(GOALS_AGAINST,0) as GA, COALESCE(GOAL_DIFFERENCE,0) as GD, COALESCE(POINTS,0) as Pts FROM TEAMS ORDER BY Pts DESC, GD DESC, GF DESC";
+                           "COALESCE(GOALS_AGAINST,0) as GA, COALESCE(GOAL_DIFFERENCE,0) as GD, COALESCE(POINTS,0) as Pts FROM TEAMS ORDER BY Pts DESC, GD DESC, GF DESC, NAME ASC";
 
             OracleConnection conn = new OracleConnection(DBConnect.oraDB);
 
@@ -615,6 +623,7 @@ namespace PremierLeagueSYS
             }
         }
 
+        //Method for renumbering remaining 17 teams 1-17 after relegation has taken place.
         public static void renumber(int id, int newId)
         {
             String sql = "UPDATE TEAMS SET TEAM_ID=:newId WHERE TEAM_ID=:id";
@@ -675,7 +684,7 @@ namespace PremierLeagueSYS
             return Convert.ToInt32(row["TABLE_NAME"].ToString().Substring(6));
         }
 
-        public static DataTable loadSeasons()
+        public static DataTable loadPastSeasons()
         {
             String sql = "select table_name from user_tables where table_name LIKE 'TEAMS_%' ORDER BY table_name";
 
@@ -699,7 +708,7 @@ namespace PremierLeagueSYS
         public static DataTable loadPastTable(int year)
         {
             String sql = "SELECT NAME, COALESCE(PLAYED,0) as P, COALESCE(WON,0) as W, COALESCE(DRAWN,0) as D, COALESCE(LOST,0) as L, COALESCE(GOALS_FOR,0) as GF, " +
-                         "COALESCE(GOALS_AGAINST,0) as GA, COALESCE(GOAL_DIFFERENCE,0) as GD, COALESCE(POINTS,0) as Pts FROM TEAMS_"+year+" ORDER BY Pts DESC, GD DESC, GF DESC";
+                         "COALESCE(GOALS_AGAINST,0) as GA, COALESCE(GOAL_DIFFERENCE,0) as GD, COALESCE(POINTS,0) as Pts FROM TEAMS_"+year+" ORDER BY Pts DESC, GD DESC, GF DESC, NAME ASC";
 
             OracleConnection conn = new OracleConnection(DBConnect.oraDB);
 
@@ -726,6 +735,44 @@ namespace PremierLeagueSYS
 
             bool isNum = Double.TryParse(Convert.ToString(Expression), System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out retNum);
             return isNum;
+        }
+
+        public static void generateProfile(DataTable profile, DataTable dt)
+        {
+            profile.Rows.Add("Team Name", dt.Rows[0]["NAME"].ToString());
+            profile.Rows.Add("Games Played", dt.Rows[0]["PLAYED"].ToString());
+            
+            if (Convert.ToInt32(dt.Rows[0]["HomeGames"]) != 0)
+                profile.Rows.Add("Average Home Goals", (Convert.ToDecimal(dt.Rows[0]["HomeGoals"]) / Convert.ToDecimal(dt.Rows[0]["HomeGames"])).ToString("0.00"));
+            else
+                profile.Rows.Add("Average Home Goals", "0");
+
+            if (Convert.ToInt32(dt.Rows[0]["AwayGames"]) != 0)
+                profile.Rows.Add("Average Away Goals", (Convert.ToDecimal(dt.Rows[0]["AwayGoals"]) / Convert.ToDecimal(dt.Rows[0]["AwayGames"])).ToString("0.00"));
+            else
+                profile.Rows.Add("Average Away Goals", "0");
+
+            if (Convert.ToInt32(dt.Rows[0]["PLAYED"]) != 0 && (Convert.ToInt32(dt.Rows[0]["HomeGoals"]) + Convert.ToInt32(dt.Rows[0]["AwayGoals"]) > 0))
+                profile.Rows.Add("Minutes Per Goal", ((Convert.ToDecimal(dt.Rows[0]["PLAYED"]) * 90) / (Convert.ToDecimal(dt.Rows[0]["HomeGoals"]) + Convert.ToDecimal(dt.Rows[0]["AwayGoals"]))).ToString("0.00"));
+            else
+                profile.Rows.Add("Minutes Per Goal", "0.00");
+
+            if (Convert.ToInt32(dt.Rows[0]["HomeGames"]) != 0)
+                profile.Rows.Add("Home Win %", ((Convert.ToDecimal(dt.Rows[0]["HomeWins"]) / Convert.ToDecimal(dt.Rows[0]["HomeGames"])) * 100).ToString("0.00") + "%");
+            else
+                profile.Rows.Add("Home Win %", "0.00%");
+
+            if (Convert.ToInt32(dt.Rows[0]["AwayGames"]) != 0)
+                profile.Rows.Add("Away Win %", ((Convert.ToDecimal(dt.Rows[0]["AwayWins"]) / Convert.ToDecimal(dt.Rows[0]["AwayGames"])) * 100).ToString("0.00") + "%");
+            else
+                profile.Rows.Add("Away Win %", "0.00%");
+
+            if (Convert.ToInt32(dt.Rows[0]["PLAYED"]) != 0)
+                profile.Rows.Add("Points Per Game", (Convert.ToDecimal(dt.Rows[0]["POINTS"]) / Convert.ToDecimal(dt.Rows[0]["PLAYED"])).ToString("0.00"));
+            else
+                profile.Rows.Add("Points Per Game", "0");
+
+            profile.Rows.Add("Clean Sheets", dt.Rows[0]["CleanSheets"]);
         }
     }
 }

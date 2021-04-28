@@ -21,7 +21,7 @@ namespace PremierLeagueSYS
         public String time { get; set; }
         public int homeGoals { get; set; }
         public int awayGoals { get; set; }
-        OracleConnection conn = new OracleConnection(DBConnect.oraDB);
+        private OracleConnection conn = new OracleConnection(DBConnect.oraDB);
 
         public Fixture()
         {}
@@ -58,9 +58,20 @@ namespace PremierLeagueSYS
             }
         }
 
-        // code in generate() method heavily inspired by this video https://www.youtube.com/watch?v=tMQptqtTrpM&t=961s 
         public static void generate()
         {
+
+            /*****************************************************
+            *    Title: Tournament Schedule Generator Code PHP
+            *    Author: Coding
+            *    Lines: 75-102, 111-123
+            *    Site owner/sponsor: youtube.com
+            *    Date: 2017
+            *    Code version: edited Nov 24 2017
+            *    Availability: https://youtu.be/tMQptqtTrpM
+            *    Modified:  Converted from PHP to C#
+            *****************************************************/
+
             DataTable dt = getAllIds();
             int[] ids = new int[dt.Rows.Count];
             int i = 0;
@@ -90,6 +101,7 @@ namespace PremierLeagueSYS
                     homeTeams[j] = team1;
                     awayTeams[j] = team2;
 
+                    //swap position of teams every other gameweek for more realistic looking fixture schedule
                     if (j % 2 == 0)
                     {
                         homeTeams[j] = team2;
@@ -104,13 +116,13 @@ namespace PremierLeagueSYS
                 temp = ids[1];
 
                 for (int l = 1; l < totalTeams - 1; l++)
+                {
                     ids[l] = ids[l + 1];
+                }
 
                 ids[totalTeams - 1] = temp;
 
             }
-
-            MessageBox.Show("Fixtures for the Premier League have been successfully generated! You are now able to schedule fixtures and update results!");
         }
 
         public static DataTable getAllIds()
@@ -181,14 +193,14 @@ namespace PremierLeagueSYS
             f.insert();
         }
 
-        public static DataTable getUnplayedFixtures(int id)
+        public static DataTable getUnscheduledFixtures(int id)
         {
-            String sql = "SELECT FIX_ID, GAMEWEEK, h.TEAM_ID, h.NAME as HomeTeam, a.TEAM_ID, a.NAME as AwayTeam, FIX_DATE, HOME_GOALS" +
+            String sql = "SELECT FIX_ID, GAMEWEEK, h.TEAM_ID, h.NAME as HomeTeam, a.TEAM_ID, a.NAME as AwayTeam, FIX_DATE" +
                 " FROM TEAMS h" +
                 " JOIN FIXTURES f on h.TEAM_ID=f.HOME_TEAM_ID" +
                 " JOIN TEAMS a on a.TEAM_ID=f.AWAY_TEAM_ID" +
-                " WHERE (f.HOME_TEAM_ID = :id OR f.AWAY_TEAM_ID=:id) AND HOME_GOALS IS NULL AND (TO_DATE(FIX_DATE,'dd/mm/yyyy') > CURRENT_DATE OR FIX_DATE IS NULL)" +
-                " ORDER BY GAMEWEEK ASC";
+                " WHERE (f.HOME_TEAM_ID = :id OR f.AWAY_TEAM_ID=:id) AND FIX_DATE IS NULL" +
+                " ORDER BY HomeTeam,AwayTeam";
 
             OracleConnection conn = new OracleConnection(DBConnect.oraDB);
 
@@ -208,7 +220,7 @@ namespace PremierLeagueSYS
             return dt;
         }
 
-        public static DataTable getFixtures(int id)
+        public static DataTable getUnplayedFixtures(int id)
         {
             String sql = "SELECT FIX_ID, GAMEWEEK, h.TEAM_ID, h.NAME as HomeTeam, a.TEAM_ID, a.NAME as AwayTeam, FIX_DATE, HOME_GOALS" +
                 " FROM TEAMS h" +
@@ -235,11 +247,139 @@ namespace PremierLeagueSYS
             return dt;
         }
 
+        public static DataTable getAllFixtures(int id)
+        {
+            String sql = "SELECT FIX_ID, GAMEWEEK, h.TEAM_ID, h.NAME as HomeTeam, a.TEAM_ID, a.NAME as AwayTeam, FIX_DATE, FIX_TIME, HOME_GOALS, AWAY_GOALS" +
+                " FROM TEAMS h" +
+                " JOIN FIXTURES f on h.TEAM_ID=f.HOME_TEAM_ID" +
+                " JOIN TEAMS a on a.TEAM_ID=f.AWAY_TEAM_ID" +
+                " WHERE (f.HOME_TEAM_ID = :id OR f.AWAY_TEAM_ID=:id)" +
+                " ORDER BY GAMEWEEK ASC";
+
+            OracleConnection conn = new OracleConnection(DBConnect.oraDB);
+
+            conn.Open();
+
+            OracleCommand cmd = new OracleCommand(sql, conn);
+            cmd.Parameters.Add(":id", id);
+
+            OracleDataAdapter da = new OracleDataAdapter(cmd);
+
+            DataTable dt = new DataTable();
+
+            da.Fill(dt);
+
+            conn.Close();
+
+            return dt;
+        }
+
+        public static DataTable getFixByGameweek(int id)
+        {
+            String sql = "SELECT FIX_ID, GAMEWEEK, h.TEAM_ID, h.NAME as HomeTeam, a.TEAM_ID, a.NAME as AwayTeam, FIX_DATE, FIX_TIME, HOME_GOALS, AWAY_GOALS" +
+                " FROM TEAMS h" +
+                " JOIN FIXTURES f on h.TEAM_ID=f.HOME_TEAM_ID" +
+                " JOIN TEAMS a on a.TEAM_ID=f.AWAY_TEAM_ID" +
+                " WHERE GAMEWEEK =:id" +
+                " ORDER BY FIX_ID ASC";
+
+            OracleConnection conn = new OracleConnection(DBConnect.oraDB);
+
+            conn.Open();
+
+            OracleCommand cmd = new OracleCommand(sql, conn);
+            cmd.Parameters.Add(":id", id);
+
+            OracleDataAdapter da = new OracleDataAdapter(cmd);
+
+            DataTable dt = new DataTable();
+
+            da.Fill(dt);
+
+            conn.Close();
+
+            return dt;
+        }
+
+        public static void loadTeamResults(DataTable dt, RichTextBox rtb)
+        {
+            foreach (DataRow dr in dt.Rows)
+                rtb.Text += "GW " + dr["GAMEWEEK"] + " - " + dr["HomeTeam"].ToString() + " " + dr["HOME_GOALS"].ToString() + " v " 
+                             + dr["AWAY_GOALS"].ToString() + " " + dr["AwayTeam"].ToString() + "\n";
+        }
+
+        public static void loadGameweekResults(DataTable dt, RichTextBox rtb)
+        {
+            foreach (DataRow dr in dt.Rows)
+                rtb.Text += dr["HomeTeam"].ToString() + " " + dr["HOME_GOALS"].ToString() + " v "
+                            + dr["AWAY_GOALS"].ToString() + " " + dr["AwayTeam"].ToString() + "\n";
+        }
+
+        public static void loadFixtures(DataTable dt, ComboBox cbo)
+        {
+            foreach (DataRow dr in dt.Rows)
+                cbo.Items.Add(Convert.ToInt32(dr["FIX_ID"]).ToString("000") + " - " + dr["HomeTeam"].ToString() + " vs " + dr["AwayTeam"].ToString());
+        }
+
+        public static String getFixDate(int id)
+        {
+            String sql = "SELECT FIX_DATE FROM FIXTURES WHERE FIX_ID =:id";
+            String date = "";
+
+            OracleConnection conn = new OracleConnection(DBConnect.oraDB);
+
+            conn.Open();
+
+            OracleCommand cmd = new OracleCommand(sql, conn); 
+            cmd.Parameters.Add(":id", id);
+
+            OracleDataAdapter da = new OracleDataAdapter(cmd);
+
+            DataTable dt = new DataTable();
+
+            da.Fill(dt);
+
+            conn.Close();
+
+            foreach (DataRow dr in dt.Rows)
+            {
+                date = dr["FIX_DATE"].ToString();
+            }
+
+            return date;
+        }
+
+        public static String getFixTime(int id)
+        {
+            String sql = "SELECT FIX_TIME FROM FIXTURES WHERE FIX_ID =:id";
+            String time = "";
+
+            OracleConnection conn = new OracleConnection(DBConnect.oraDB);
+
+            conn.Open();
+
+            OracleCommand cmd = new OracleCommand(sql, conn);
+            cmd.Parameters.Add(":id", id);
+
+            OracleDataAdapter da = new OracleDataAdapter(cmd);
+
+            DataTable dt = new DataTable();
+
+            da.Fill(dt);
+
+            conn.Close();
+
+            foreach (DataRow dr in dt.Rows)
+            {
+                time = dr["FIX_TIME"].ToString();
+            }
+
+            return time;
+        }
+
         public void schedule()
         {
             String sql = "UPDATE FIXTURES SET FIX_DATE=:dat, FIX_TIME=:time WHERE FIX_ID=:id";
-
-            OracleConnection conn = new OracleConnection(DBConnect.oraDB);
 
             conn.Open();
 
@@ -285,8 +425,6 @@ namespace PremierLeagueSYS
         public void updateResult()
         {
             String sql = "UPDATE FIXTURES SET HOME_GOALS=:hg, AWAY_GOALS=:ag WHERE FIX_ID=:id";
-
-            OracleConnection conn = new OracleConnection(DBConnect.oraDB);
 
             conn.Open();
 
@@ -378,6 +516,7 @@ namespace PremierLeagueSYS
             conn.Close();
         }
 
+        //Method to determine whether or not an appropriate amount of time (three weeks) has passed between the conclusion of one season and the attempt to start a new one.
         public static bool hasTimeElapsed()
         {
             String sql = "SELECT max(TO_DATE(FIX_DATE,'dd/mm/yyyy')) as FIX_DATE FROM FIXTURES";
@@ -410,9 +549,20 @@ namespace PremierLeagueSYS
             return true;
         }
 
+        /*Method for determining the dates that a fixture may be scheduled between. 
+         * Returns List containing season start+end dates (first Saturday in August and last Sunday in May of supplied 'startYear').*/
         public static List<DateTime> setDateLimits(int startYear)
         {
-            //some advice on identifying first/last weekend found here https://stackoverflow.com/a/29026846
+            /*****************************************************
+            *    Title: How to get the first Sunday of next month for a given date? 
+            *    Author: Soner Gönül
+            *    Lines: 567-594
+            *    Site owner/sponsor: stackoverflow.com
+            *    Date: 2015
+            *    Code version: edited March 13 2015
+            *    Availability: https://stackoverflow.com/a/29026846
+            *    Modified: N/A
+            *****************************************************/
 
             DateTime lastDay = new DateTime(startYear + 1, 05, 31);
             DateTime lastSun;
@@ -444,6 +594,7 @@ namespace PremierLeagueSYS
             return dates;
         }
 
+        //Method to retrieve Team_IDs of teams involved in a particular fixture.
         public static List<int> getIdsFromFixture(int id)
         {
             String sql = "SELECT HOME_TEAM_ID, AWAY_TEAM_ID FROM FIXTURES WHERE FIX_ID=:id";
@@ -473,14 +624,16 @@ namespace PremierLeagueSYS
             return ids;
         }
 
+        //Method to determine if either team playing in the supplied fixture already has a game within 3 days of the supplied date.
+        //Method also used in rescheduling, compares Fixture IDs so that a fixture may be moved by < 4 days so long as it does not cause congestion with a different fixture.
         public static bool isCongestion(int id, DateTime date)
         {
             List<int> ids = getIdsFromFixture(id);
-            
-            String sql = "SELECT FIX_DATE FROM FIXTURES WHERE (HOME_TEAM_ID=:htid OR AWAY_TEAM_ID=:atid OR HOME_TEAM_ID=:atid OR AWAY_TEAM_ID=:htid) AND FIX_DATE IS NOT NULL";
 
-            OracleConnection conn = new OracleConnection(DBConnect.oraDB); 
-            
+            String sql = "SELECT FIX_ID, FIX_DATE FROM FIXTURES WHERE (HOME_TEAM_ID=:htid OR AWAY_TEAM_ID=:atid OR HOME_TEAM_ID=:atid OR AWAY_TEAM_ID=:htid) AND FIX_DATE IS NOT NULL";
+
+            OracleConnection conn = new OracleConnection(DBConnect.oraDB);
+
             conn.Open();
 
             OracleCommand cmd = new OracleCommand(sql, conn);
@@ -497,16 +650,16 @@ namespace PremierLeagueSYS
 
             TimeSpan timeSpan;
 
-            foreach(DataRow row in dt.Rows)
+            foreach (DataRow row in dt.Rows)
             {
-                if(Convert.ToDateTime(row["FIX_DATE"]) > date)
+                if (Convert.ToDateTime(row["FIX_DATE"]) > date && Convert.ToInt32(row["FIX_ID"]) != id)
                 {
                     timeSpan = Convert.ToDateTime(row["FIX_DATE"]).Subtract(date);
 
                     if ((int)timeSpan.TotalDays < 3)
                         return true;
                 }
-                else
+                else if (Convert.ToDateTime(row["FIX_DATE"]) < date && Convert.ToInt32(row["FIX_ID"]) != id)
                 {
                     timeSpan = date.Subtract(Convert.ToDateTime(row["FIX_DATE"]));
 
@@ -516,6 +669,30 @@ namespace PremierLeagueSYS
             }
 
             return false;
+        }
+
+        public static void loadGameweeks(ComboBox cbo)
+        {
+            String sql = "SELECT DISTINCT GAMEWEEK FROM FIXTURES ORDER BY GAMEWEEK ASC";
+
+            OracleConnection conn = new OracleConnection(DBConnect.oraDB);
+
+            conn.Open();
+
+            OracleCommand cmd = new OracleCommand(sql, conn);
+
+            OracleDataAdapter da = new OracleDataAdapter(cmd);
+
+            DataTable dt = new DataTable();
+
+            da.Fill(dt);
+
+            conn.Close();
+
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                cbo.Items.Add(Convert.ToInt32(dt.Rows[i]["GAMEWEEK"]));
+            }
         }
     }
 }

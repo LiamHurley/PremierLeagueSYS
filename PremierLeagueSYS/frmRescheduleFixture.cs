@@ -10,25 +10,25 @@ using System.Windows.Forms;
 
 namespace PremierLeagueSYS
 {
-    public partial class frmScheduleFixture : Form
+    public partial class frmRescheduleFixture : Form
     {
         private frmMainMenu parent;
         private Fixture f = new Fixture();
         private int startYear;
-        private List<DateTime> dates= new List<DateTime>();
+        private List<DateTime> dates = new List<DateTime>();
 
-        public frmScheduleFixture()
+        public frmRescheduleFixture()
         {
             InitializeComponent();
         }
 
-        public frmScheduleFixture(frmMainMenu Parent)
+        public frmRescheduleFixture(frmMainMenu Parent)
         {
             InitializeComponent();
             parent = Parent;
         }
 
-        private void frmScheduleFixture_Load(object sender, EventArgs e)
+        private void frmRescheduleFixture_Load(object sender, EventArgs e)
         {
             if (!Fixture.fixturesExist())
             {
@@ -38,9 +38,9 @@ namespace PremierLeagueSYS
             }
 
             startYear = Team.getLastYear();
-            
+
             dates = Fixture.setDateLimits(startYear);
-            
+
             dtpFixDate.MaxDate = dates[0];
             dtpFixDate.MinDate = dates[1];
             if (DateTime.Today > dates[1])
@@ -53,36 +53,43 @@ namespace PremierLeagueSYS
 
         private void cboSelectTeam_SelectedValueChanged(object sender, EventArgs e)
         {
-            if(cboSelectTeam.SelectedIndex == -1)
+            if (cboSelectTeam.SelectedIndex == -1)
                 return;
-            
-            cboSelectFixture.Items.Clear();
-            
-            DataTable dt = Fixture.getUnscheduledFixtures(Convert.ToInt32(Utility.deformatId(cboSelectTeam.Text.Substring(0, 3))));
 
-            Fixture.loadFixtures(dt,cboSelectFixture);
+            cboSelectFixture.Items.Clear();
+
+            DataTable dt = Fixture.getUnplayedFixtures(Convert.ToInt32(Utility.deformatId(cboSelectTeam.Text.Substring(0, 3))));
+
+            Fixture.loadFixtures(dt, cboSelectFixture);
         }
-        
+
         private void btnSelectFixture_Click(object sender, EventArgs e)
         {
-            if(string.IsNullOrEmpty(cboSelectTeam.Text) || string.IsNullOrEmpty(cboSelectFixture.Text))
+            if (string.IsNullOrEmpty(cboSelectTeam.Text) || string.IsNullOrEmpty(cboSelectFixture.Text))
             {
                 MessageBox.Show("You must select a team and a fixture to proceed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            DialogResult dialog1 = MessageBox.Show("Are you sure you wish to schedule " + cboSelectFixture.Text.Substring(6) + "?", "Confirm",
+            DialogResult dialog1 = MessageBox.Show("Are you sure you wish to reschedule " + cboSelectFixture.Text.Substring(6) + "?", "Confirm",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
-            if(dialog1 == DialogResult.Yes)
+            if (dialog1 == DialogResult.Yes)
             {
-                f.id = Convert.ToInt32(Utility.deformatId(cboSelectFixture.Text.Substring(0,3)));
+                f.id = Convert.ToInt32(Utility.deformatId(cboSelectFixture.Text.Substring(0, 3)));
+                f.date = Fixture.getFixDate(Convert.ToInt32(Utility.deformatId(cboSelectFixture.Text.Substring(0, 3))));
+                f.time = Fixture.getFixTime(Convert.ToInt32(Utility.deformatId(cboSelectFixture.Text.Substring(0, 3))));
 
                 btnSelectFixture.Hide();
                 lblFixDate.Show();
                 lblFixTime.Show();
+                
+                dtpFixDate.Value = Convert.ToDateTime(f.date);
                 dtpFixDate.Show();
+                
+                cboTimes.Text = f.time;
                 cboTimes.Show();
+                
                 btnScheduleFixture.Show();
                 cboSelectTeam.Enabled = false;
                 cboSelectFixture.Enabled = false;
@@ -91,7 +98,7 @@ namespace PremierLeagueSYS
 
         private void btnScheduleFixture_Click(object sender, EventArgs e)
         {
-            int id = Convert.ToInt32(Utility.deformatId(cboSelectFixture.Text.Substring(0,3)));
+            int id = Convert.ToInt32(Utility.deformatId(cboSelectFixture.Text.Substring(0, 3)));
 
             if (string.IsNullOrEmpty(cboTimes.Text) || string.IsNullOrEmpty(dtpFixDate.Text))
             {
@@ -99,22 +106,22 @@ namespace PremierLeagueSYS
                 return;
             }
 
-            DialogResult dialog1 = MessageBox.Show("Are you sure you wish to schedule " + cboSelectFixture.Text + " with the following date and time?\n\nDate: " + dtpFixDate.Text + "\nTime: " 
+            DialogResult dialog1 = MessageBox.Show("Are you sure you wish to reschedule " + cboSelectFixture.Text + " with the following date and time?\n\nDate: " + dtpFixDate.Text + "\nTime: "
                                                 + cboTimes.Text, "Confirm",
                                                 MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
-            if(dialog1 != DialogResult.Yes)
+            if (dialog1 != DialogResult.Yes)
                 return;
 
-            if (!Fixture.isValidDate(id,dtpFixDate.Text))
+            if (!Fixture.isValidDate(id, dtpFixDate.Text))
             {
-                MessageBox.Show("One of the teams in this fixture already has a game scheduled for "+dtpFixDate.Text+".\n\nPlease select a different date."
+                MessageBox.Show("One of the teams in this fixture already has a game scheduled for " + dtpFixDate.Text + ".\n\nPlease select a different date."
                     , "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 dtpFixDate.Focus();
                 return;
             }
 
-            if(Fixture.isCongestion(id,Convert.ToDateTime(dtpFixDate.Text)))
+            if (Fixture.isCongestion(id, Convert.ToDateTime(dtpFixDate.Text)))
             {
                 MessageBox.Show("One of the teams in this fixture already has a game scheduled within 3 days of " + dtpFixDate.Text + ".\n\nPlease select a" +
                     " different date.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -124,10 +131,10 @@ namespace PremierLeagueSYS
 
             f.date = dtpFixDate.Text;
             f.time = cboTimes.Text;
-            
+
             f.schedule();
-            
-            MessageBox.Show("You have successfully scheduled Match No #" + cboSelectFixture.Text.Substring(0, 3) + " to be played on:\n\nDate: " + dtpFixDate.Text + "\nTime: " + cboTimes.Text);
+
+            MessageBox.Show("You have successfully rescheduled Match No #" + cboSelectFixture.Text.Substring(0, 3) + " to be played on:\n\nDate: " + dtpFixDate.Text + "\nTime: " + cboTimes.Text);
 
             lblFixDate.Hide();
             lblFixTime.Hide();
@@ -144,11 +151,8 @@ namespace PremierLeagueSYS
             btnSelectFixture.Show();
             btnScheduleFixture.Hide();
             
-            cboSelectFixture.Items.Remove(cboSelectFixture.SelectedItem);
-            
             cboSelectTeam.SelectedIndex = -1;
             cboSelectFixture.SelectedIndex = -1;
-            
             cboSelectTeam.Enabled = true;
             cboSelectFixture.Enabled = true;
         }
@@ -173,5 +177,6 @@ namespace PremierLeagueSYS
             if (dialog1 == DialogResult.Yes)
                 Application.Exit();
         }
-    }
+    
+}
 }

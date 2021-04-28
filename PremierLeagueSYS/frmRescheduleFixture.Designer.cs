@@ -1,6 +1,6 @@
 ﻿namespace PremierLeagueSYS
 {
-    partial class frmEnterResult
+    partial class frmRescheduleFixture
     {
         /// <summary>
         /// Required designer variable.
@@ -28,11 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnSubmitResult = new System.Windows.Forms.Button();
-            this.txtAwayGoals = new System.Windows.Forms.TextBox();
-            this.lblAwayGoals = new System.Windows.Forms.Label();
-            this.txtHomeGoals = new System.Windows.Forms.TextBox();
-            this.lblHomeGoals = new System.Windows.Forms.Label();
+            this.cboTimes = new System.Windows.Forms.ComboBox();
+            this.dtpFixDate = new System.Windows.Forms.DateTimePicker();
+            this.btnScheduleFixture = new System.Windows.Forms.Button();
+            this.lblFixTime = new System.Windows.Forms.Label();
+            this.lblFixDate = new System.Windows.Forms.Label();
             this.btnSelectFixture = new System.Windows.Forms.Button();
             this.cboSelectFixture = new System.Windows.Forms.ComboBox();
             this.lblSelectFixture = new System.Windows.Forms.Label();
@@ -60,69 +60,87 @@
             this.mnuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
-            // btnSubmitResult
+            // cboTimes
             // 
-            this.btnSubmitResult.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnSubmitResult.ForeColor = System.Drawing.Color.Black;
-            this.btnSubmitResult.Location = new System.Drawing.Point(545, 300);
-            this.btnSubmitResult.Name = "btnSubmitResult";
-            this.btnSubmitResult.Size = new System.Drawing.Size(168, 54);
-            this.btnSubmitResult.TabIndex = 29;
-            this.btnSubmitResult.Text = "Submit Result";
-            this.btnSubmitResult.UseVisualStyleBackColor = true;
-            this.btnSubmitResult.Visible = false;
-            this.btnSubmitResult.Click += new System.EventHandler(this.btnSubmitResult_Click);
+            this.cboTimes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboTimes.DropDownWidth = 350;
+            this.cboTimes.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cboTimes.FormattingEnabled = true;
+            this.cboTimes.Items.AddRange(new object[] {
+            "12:00",
+            "12:30",
+            "13:00",
+            "14:00",
+            "15:00",
+            "16:00",
+            "16:30",
+            "17:00",
+            "17:30",
+            "18:00",
+            "19:30",
+            "20:00"});
+            this.cboTimes.Location = new System.Drawing.Point(251, 328);
+            this.cboTimes.Name = "cboTimes";
+            this.cboTimes.Size = new System.Drawing.Size(249, 26);
+            this.cboTimes.TabIndex = 31;
+            this.cboTimes.Visible = false;
             // 
-            // txtAwayGoals
+            // dtpFixDate
             // 
-            this.txtAwayGoals.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtAwayGoals.Location = new System.Drawing.Point(251, 327);
-            this.txtAwayGoals.MaxLength = 2;
-            this.txtAwayGoals.Name = "txtAwayGoals";
-            this.txtAwayGoals.Size = new System.Drawing.Size(249, 27);
-            this.txtAwayGoals.TabIndex = 28;
-            this.txtAwayGoals.Visible = false;
+            this.dtpFixDate.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dtpFixDate.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+            this.dtpFixDate.Location = new System.Drawing.Point(251, 256);
+            this.dtpFixDate.MaxDate = new System.DateTime(2022, 5, 15, 0, 0, 0, 0);
+            this.dtpFixDate.MinDate = new System.DateTime(2021, 8, 6, 0, 0, 0, 0);
+            this.dtpFixDate.Name = "dtpFixDate";
+            this.dtpFixDate.Size = new System.Drawing.Size(249, 27);
+            this.dtpFixDate.TabIndex = 30;
+            this.dtpFixDate.Value = new System.DateTime(2021, 8, 6, 0, 0, 0, 0);
+            this.dtpFixDate.Visible = false;
             // 
-            // lblAwayGoals
+            // btnScheduleFixture
             // 
-            this.lblAwayGoals.AutoSize = true;
-            this.lblAwayGoals.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblAwayGoals.Location = new System.Drawing.Point(78, 326);
-            this.lblAwayGoals.Name = "lblAwayGoals";
-            this.lblAwayGoals.Size = new System.Drawing.Size(113, 25);
-            this.lblAwayGoals.TabIndex = 27;
-            this.lblAwayGoals.Text = "Away Goals:";
-            this.lblAwayGoals.Visible = false;
+            this.btnScheduleFixture.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnScheduleFixture.ForeColor = System.Drawing.Color.Black;
+            this.btnScheduleFixture.Location = new System.Drawing.Point(543, 301);
+            this.btnScheduleFixture.Name = "btnScheduleFixture";
+            this.btnScheduleFixture.Size = new System.Drawing.Size(168, 54);
+            this.btnScheduleFixture.TabIndex = 29;
+            this.btnScheduleFixture.Text = "Schedule Fixture";
+            this.btnScheduleFixture.UseVisualStyleBackColor = true;
+            this.btnScheduleFixture.Visible = false;
+            this.btnScheduleFixture.Click += new System.EventHandler(this.btnScheduleFixture_Click);
             // 
-            // txtHomeGoals
+            // lblFixTime
             // 
-            this.txtHomeGoals.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtHomeGoals.Location = new System.Drawing.Point(251, 260);
-            this.txtHomeGoals.MaxLength = 2;
-            this.txtHomeGoals.Name = "txtHomeGoals";
-            this.txtHomeGoals.Size = new System.Drawing.Size(249, 27);
-            this.txtHomeGoals.TabIndex = 26;
-            this.txtHomeGoals.Visible = false;
+            this.lblFixTime.AutoSize = true;
+            this.lblFixTime.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblFixTime.Location = new System.Drawing.Point(78, 326);
+            this.lblFixTime.Name = "lblFixTime";
+            this.lblFixTime.Size = new System.Drawing.Size(119, 25);
+            this.lblFixTime.TabIndex = 28;
+            this.lblFixTime.Text = "Fixture Time:";
+            this.lblFixTime.Visible = false;
             // 
-            // lblHomeGoals
+            // lblFixDate
             // 
-            this.lblHomeGoals.AutoSize = true;
-            this.lblHomeGoals.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblHomeGoals.Location = new System.Drawing.Point(78, 259);
-            this.lblHomeGoals.Name = "lblHomeGoals";
-            this.lblHomeGoals.Size = new System.Drawing.Size(118, 25);
-            this.lblHomeGoals.TabIndex = 25;
-            this.lblHomeGoals.Text = "Home Goals:";
-            this.lblHomeGoals.Visible = false;
+            this.lblFixDate.AutoSize = true;
+            this.lblFixDate.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblFixDate.Location = new System.Drawing.Point(78, 256);
+            this.lblFixDate.Name = "lblFixDate";
+            this.lblFixDate.Size = new System.Drawing.Size(117, 25);
+            this.lblFixDate.TabIndex = 27;
+            this.lblFixDate.Text = "Fixture Date:";
+            this.lblFixDate.Visible = false;
             // 
             // btnSelectFixture
             // 
             this.btnSelectFixture.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnSelectFixture.ForeColor = System.Drawing.Color.Black;
-            this.btnSelectFixture.Location = new System.Drawing.Point(545, 162);
+            this.btnSelectFixture.Location = new System.Drawing.Point(543, 165);
             this.btnSelectFixture.Name = "btnSelectFixture";
             this.btnSelectFixture.Size = new System.Drawing.Size(168, 54);
-            this.btnSelectFixture.TabIndex = 24;
+            this.btnSelectFixture.TabIndex = 26;
             this.btnSelectFixture.Text = "Select Fixture";
             this.btnSelectFixture.UseVisualStyleBackColor = true;
             this.btnSelectFixture.Click += new System.EventHandler(this.btnSelectFixture_Click);
@@ -131,12 +149,12 @@
             // 
             this.cboSelectFixture.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboSelectFixture.DropDownWidth = 350;
-            this.cboSelectFixture.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cboSelectFixture.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboSelectFixture.FormattingEnabled = true;
-            this.cboSelectFixture.Location = new System.Drawing.Point(251, 192);
+            this.cboSelectFixture.Location = new System.Drawing.Point(251, 193);
             this.cboSelectFixture.Name = "cboSelectFixture";
-            this.cboSelectFixture.Size = new System.Drawing.Size(249, 28);
-            this.cboSelectFixture.TabIndex = 23;
+            this.cboSelectFixture.Size = new System.Drawing.Size(249, 26);
+            this.cboSelectFixture.TabIndex = 25;
             // 
             // lblSelectFixture
             // 
@@ -145,19 +163,19 @@
             this.lblSelectFixture.Location = new System.Drawing.Point(78, 191);
             this.lblSelectFixture.Name = "lblSelectFixture";
             this.lblSelectFixture.Size = new System.Drawing.Size(128, 25);
-            this.lblSelectFixture.TabIndex = 22;
+            this.lblSelectFixture.TabIndex = 24;
             this.lblSelectFixture.Text = "Select Fixture:";
             // 
             // cboSelectTeam
             // 
             this.cboSelectTeam.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboSelectTeam.DropDownWidth = 250;
-            this.cboSelectTeam.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cboSelectTeam.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboSelectTeam.FormattingEnabled = true;
-            this.cboSelectTeam.Location = new System.Drawing.Point(251, 122);
+            this.cboSelectTeam.Location = new System.Drawing.Point(251, 123);
             this.cboSelectTeam.Name = "cboSelectTeam";
-            this.cboSelectTeam.Size = new System.Drawing.Size(249, 28);
-            this.cboSelectTeam.TabIndex = 21;
+            this.cboSelectTeam.Size = new System.Drawing.Size(249, 26);
+            this.cboSelectTeam.TabIndex = 23;
             this.cboSelectTeam.SelectedValueChanged += new System.EventHandler(this.cboSelectTeam_SelectedValueChanged);
             // 
             // lblSelectTeam
@@ -167,7 +185,7 @@
             this.lblSelectTeam.Location = new System.Drawing.Point(78, 121);
             this.lblSelectTeam.Name = "lblSelectTeam";
             this.lblSelectTeam.Size = new System.Drawing.Size(115, 25);
-            this.lblSelectTeam.TabIndex = 20;
+            this.lblSelectTeam.TabIndex = 22;
             this.lblSelectTeam.Text = "Select Team:";
             // 
             // mnuStrip
@@ -180,7 +198,7 @@
             this.mnuStrip.Location = new System.Drawing.Point(0, 0);
             this.mnuStrip.Name = "mnuStrip";
             this.mnuStrip.Size = new System.Drawing.Size(800, 24);
-            this.mnuStrip.TabIndex = 33;
+            this.mnuStrip.TabIndex = 32;
             this.mnuStrip.Text = "menuStrip1";
             // 
             // mnuTeams
@@ -312,26 +330,26 @@
             this.mnuExit.Text = "Exit";
             this.mnuExit.Click += new System.EventHandler(this.mnuExit_Click);
             // 
-            // frmEnterResult
+            // frmRescheduleFixture
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.mnuStrip);
-            this.Controls.Add(this.btnSubmitResult);
-            this.Controls.Add(this.txtAwayGoals);
-            this.Controls.Add(this.lblAwayGoals);
-            this.Controls.Add(this.txtHomeGoals);
-            this.Controls.Add(this.lblHomeGoals);
+            this.Controls.Add(this.cboTimes);
+            this.Controls.Add(this.dtpFixDate);
+            this.Controls.Add(this.btnScheduleFixture);
+            this.Controls.Add(this.lblFixTime);
+            this.Controls.Add(this.lblFixDate);
             this.Controls.Add(this.btnSelectFixture);
             this.Controls.Add(this.cboSelectFixture);
             this.Controls.Add(this.lblSelectFixture);
             this.Controls.Add(this.cboSelectTeam);
             this.Controls.Add(this.lblSelectTeam);
-            this.Name = "frmEnterResult";
-            this.Text = "PremierLeagueSYS - Enter Result";
-            this.Load += new System.EventHandler(this.frmEnterResult_Load);
+            this.Name = "frmRescheduleFixture";
+            this.Text = "PremierLeagueSYS - Reschedule Fixture";
+            this.Load += new System.EventHandler(this.frmRescheduleFixture_Load);
             this.mnuStrip.ResumeLayout(false);
             this.mnuStrip.PerformLayout();
             this.ResumeLayout(false);
@@ -340,11 +358,11 @@
         }
 
         #endregion
-        private System.Windows.Forms.Button btnSubmitResult;
-        private System.Windows.Forms.TextBox txtAwayGoals;
-        private System.Windows.Forms.Label lblAwayGoals;
-        private System.Windows.Forms.TextBox txtHomeGoals;
-        private System.Windows.Forms.Label lblHomeGoals;
+        private System.Windows.Forms.ComboBox cboTimes;
+        private System.Windows.Forms.DateTimePicker dtpFixDate;
+        private System.Windows.Forms.Button btnScheduleFixture;
+        private System.Windows.Forms.Label lblFixTime;
+        private System.Windows.Forms.Label lblFixDate;
         private System.Windows.Forms.Button btnSelectFixture;
         private System.Windows.Forms.ComboBox cboSelectFixture;
         private System.Windows.Forms.Label lblSelectFixture;

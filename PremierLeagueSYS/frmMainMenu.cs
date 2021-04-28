@@ -95,5 +95,19 @@ namespace PremierLeagueSYS
             this.Hide();
             nextForm.Show();
         }
+
+        private void mnuReschedule_Click(object sender, EventArgs e)
+        {
+            frmRescheduleFixture nextForm = new frmRescheduleFixture(this);
+            this.Hide();
+            nextForm.Show();
+        }
+
+        private void viewResultsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            frmViewResults nextForm = new frmViewResults(this);
+            this.Hide();
+            nextForm.Show();
+        }
     }
 }

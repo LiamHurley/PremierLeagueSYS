@@ -22,34 +22,34 @@ namespace PremierLeagueSYS
         public frmNewSeason(frmMainMenu Parent)
         {
             InitializeComponent();
-            parent = Parent;
+            parent=Parent;
         }
 
         private void frmNewSeason_Load(object sender, EventArgs e)
         {
-            /*if(!Team.isSeasonComplete())
+            if(!Team.isSeasonComplete())
             {
-                MessageBox.Show("You may not start a new season whilst one is currently in progress.\n\nReturning to main menu.");
+                MessageBox.Show("You may not start a new season whilst one is currently in progress.\n\nReturning to main menu.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.Close();
                 parent.Visible = true;
-            }*/
+            }
+
+            if (!Fixture.hasTimeElapsed())
+            {
+                MessageBox.Show("You may not start a new season so soon after the current one has ended.\n\nReturning to main menu.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+                parent.Visible = true;
+                return;
+            }
         }
 
         private void btnNewSeason_Click(object sender, EventArgs e)
         {
             DialogResult dialog = MessageBox.Show("Are you sure you wish to start a new Premier League season?\n\nThis action will save and clear all fixtures, statistics and standings from" +
-                " the current season.","Confirm",MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                " the current season.", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
-            if(dialog != DialogResult.Yes)
+            if (dialog != DialogResult.Yes)
                 return;
-
-            if(!Fixture.hasTimeElapsed())
-            {
-                MessageBox.Show("You may not start a new season so soon after the current one has ended.\n\nReturning to main menu.");
-                this.Close();
-                parent.Visible = true;
-                return;
-            }
 
             int endYear = Fixture.getEndYear();
 
@@ -59,6 +59,7 @@ namespace PremierLeagueSYS
 
             List<int> relegatedIds = new List<int>();
 
+            //method?
             for(int i = table.Rows.Count-1; i >= table.Rows.Count-3; i--)
             {
                 relegatedIds.Add(Convert.ToInt32(table.Rows[i]["TEAM_ID"]));
@@ -75,7 +76,6 @@ namespace PremierLeagueSYS
             MessageBox.Show("New season successfully created.\n\nThe new season will commence in August "+endYear+".\n\nApplication will now return to the main menu.");
             this.Close();
             parent.Visible = true;
-
         }
 
         private void mnuBack_Click(object sender, EventArgs e)

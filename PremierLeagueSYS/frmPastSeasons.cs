@@ -27,7 +27,7 @@ namespace PremierLeagueSYS
 
         private void frmPastSeasons_Load(object sender, EventArgs e)
         {
-            DataTable seasons = Team.loadSeasons();
+            DataTable seasons = Team.loadPastSeasons();
 
             if(seasons.Rows.Count==0)
             {
@@ -60,7 +60,7 @@ namespace PremierLeagueSYS
             dgvTable.Visible = true;
         }
 
-        private void mnuRemoveTeamBack_Click(object sender, EventArgs e)
+        private void mnuBack_Click(object sender, EventArgs e)
         {
             DialogResult dialog1 = MessageBox.Show("Are you sure you wish to return to the main menu?", "Confirm",
                             MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -72,7 +72,7 @@ namespace PremierLeagueSYS
             }
         }
 
-        private void mnuRemoveTeamExit_Click(object sender, EventArgs e)
+        private void mnuExit_Click(object sender, EventArgs e)
         {
             DialogResult dialog1 = MessageBox.Show("Are you sure you want to exit?", "Confirm",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question);

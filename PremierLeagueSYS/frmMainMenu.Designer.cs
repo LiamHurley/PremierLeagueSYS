@@ -38,13 +38,15 @@
             this.mnuFixtures = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuGenerateFixtures = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuScheduleFixtures = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuReschedule = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuEnterResult = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuGenerateLeagueTable = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuExit = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuSeasons = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuNewSeason = new System.Windows.Forms.ToolStripMenuItem();
-            this.picLogo = new System.Windows.Forms.PictureBox();
             this.mnuPastSeasons = new System.Windows.Forms.ToolStripMenuItem();
+            this.picLogo = new System.Windows.Forms.PictureBox();
+            this.viewResultsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picLogo)).BeginInit();
             this.SuspendLayout();
@@ -106,7 +108,9 @@
             this.mnuFixtures.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mnuGenerateFixtures,
             this.mnuScheduleFixtures,
+            this.mnuReschedule,
             this.mnuEnterResult,
+            this.viewResultsToolStripMenuItem,
             this.mnuGenerateLeagueTable});
             this.mnuFixtures.Name = "mnuFixtures";
             this.mnuFixtures.Size = new System.Drawing.Size(111, 20);
@@ -125,6 +129,13 @@
             this.mnuScheduleFixtures.Size = new System.Drawing.Size(192, 22);
             this.mnuScheduleFixtures.Text = "Schedule Fixture";
             this.mnuScheduleFixtures.Click += new System.EventHandler(this.mnuScheduleFixtures_Click);
+            // 
+            // mnuReschedule
+            // 
+            this.mnuReschedule.Name = "mnuReschedule";
+            this.mnuReschedule.Size = new System.Drawing.Size(192, 22);
+            this.mnuReschedule.Text = "Reschedule Fixture";
+            this.mnuReschedule.Click += new System.EventHandler(this.mnuReschedule_Click);
             // 
             // mnuEnterResult
             // 
@@ -160,9 +171,16 @@
             // mnuNewSeason
             // 
             this.mnuNewSeason.Name = "mnuNewSeason";
-            this.mnuNewSeason.Size = new System.Drawing.Size(180, 22);
+            this.mnuNewSeason.Size = new System.Drawing.Size(169, 22);
             this.mnuNewSeason.Text = "New Season";
             this.mnuNewSeason.Click += new System.EventHandler(this.mnuNewSeason_Click);
+            // 
+            // mnuPastSeasons
+            // 
+            this.mnuPastSeasons.Name = "mnuPastSeasons";
+            this.mnuPastSeasons.Size = new System.Drawing.Size(169, 22);
+            this.mnuPastSeasons.Text = "View Past Seasons";
+            this.mnuPastSeasons.Click += new System.EventHandler(this.mnuPastSeasons_Click);
             // 
             // picLogo
             // 
@@ -173,12 +191,12 @@
             this.picLogo.TabIndex = 1;
             this.picLogo.TabStop = false;
             // 
-            // mnuPastSeasons
+            // viewResultsToolStripMenuItem
             // 
-            this.mnuPastSeasons.Name = "mnuPastSeasons";
-            this.mnuPastSeasons.Size = new System.Drawing.Size(180, 22);
-            this.mnuPastSeasons.Text = "View Past Seasons";
-            this.mnuPastSeasons.Click += new System.EventHandler(this.mnuPastSeasons_Click);
+            this.viewResultsToolStripMenuItem.Name = "viewResultsToolStripMenuItem";
+            this.viewResultsToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            this.viewResultsToolStripMenuItem.Text = "View Results";
+            this.viewResultsToolStripMenuItem.Click += new System.EventHandler(this.viewResultsToolStripMenuItem_Click);
             // 
             // frmMainMenu
             // 
@@ -216,6 +234,8 @@
         private System.Windows.Forms.ToolStripMenuItem mnuSeasons;
         private System.Windows.Forms.ToolStripMenuItem mnuNewSeason;
         private System.Windows.Forms.ToolStripMenuItem mnuPastSeasons;
+        private System.Windows.Forms.ToolStripMenuItem mnuReschedule;
+        private System.Windows.Forms.ToolStripMenuItem viewResultsToolStripMenuItem;
     }
 }
 

@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -29,49 +30,15 @@ namespace PremierLeagueSYS
 
         private void frmEditTeam_Load(object sender, EventArgs e)
         {
-            DataTable teamsList = Team.getTeams();
-
-            for (int i = 0; i < teamsList.Rows.Count; i++)
-            {
-                cboSelectTeam.Items.Add(Convert.ToInt32(teamsList.Rows[i]["TEAM_ID"]).ToString("000")+" - "+teamsList.Rows[i]["NAME"].ToString());
-            }
+            Team.loadTeams(cboSelectTeam);
         }
         
-        private void mnuExit_Click(object sender, EventArgs e)
-        {
-            DialogResult dialog1 = MessageBox.Show("Are you sure you want to exit?", "Confirm",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-            if (dialog1 == DialogResult.Yes)
-                Application.Exit();
-        }
-
-        private void mnuBack_Click(object sender, EventArgs e)
-        {
-            DialogResult dialog1 = MessageBox.Show("Are you sure you wish to return to the main menu?", "Confirm",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-            if (dialog1 == DialogResult.Yes)
-            {
-                this.Close();
-                parent.Visible = true;
-            }
-        }
-
         private void cboSelectTeam_SelectedValueChanged(object sender, EventArgs e)
         {
-            String idStr = cboSelectTeam.Text.Substring(0, 3);
-
-            if (idStr.Substring(0, 2).Equals("00"))
-            {
-                idStr = idStr.Remove(0, 2);
-            }
-            else if (idStr[0] == '0' && idStr[1] != '0')
-            {
-                idStr = idStr.Remove(0, 1);
-            }
+            if (cboSelectTeam.SelectedIndex == -1)
+                return;
             
-            t.getTeam(Convert.ToInt32(idStr));
+            t.getTeamInfo(Convert.ToInt32(Utility.deformatId(cboSelectTeam.Text.Substring(0, 3))));
             
             TextBox[] boxes = { txtTeamName, txtManager, txtStadium, txtStadiumCapacity, txtLocation };
             Label[] labels = { lblTeamName, lblManager, lblStadium, lblStadiumCapacity, lblLocation };
@@ -94,69 +61,124 @@ namespace PremierLeagueSYS
 
         private void btnEditTeam_Click(object sender, EventArgs e)
         {
+            //learned how to use Regex here https://stackoverflow.com/a/336220
+            var managerRegex = new Regex("^[A-Za-z' ]+$");
+            var stadiumRegex = new Regex("^[A-Za-z0-9' ]+$");
+            var locationRegex = new Regex("^[A-Za-z0-9', ]+$");
+
             if (string.IsNullOrEmpty(cboSelectTeam.Text))
             {
-                MessageBox.Show("Please select a team.");
+                MessageBox.Show("Please select a team.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            DialogResult dialog1 = MessageBox.Show("Are you sure you wish to update " + cboSelectTeam.Text.Substring(6) + "'s details?", "Confirm",
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Question); ;
-
-            if (txtManager.Text != originalManager)
+            if (!managerRegex.IsMatch(txtManager.Text.ToLower().Trim()))
             {
-                if (Team.managerExists(txtManager.Text))
+                MessageBox.Show("Manager Name contains invalid characters\n\nInput may only contain the following:" +
+                    "\nUppercase letters\nLowercase letters\nApostrophes", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtManager.Focus();
+                return;
+            }
+
+            if(txtManager.Text.Contains("  "))
+            {
+                MessageBox.Show("Manager Name invalid - contains consecutive spaces!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtManager.Focus();
+                return;
+            }
+
+            if (txtManager.Text.ToLower().Trim() != originalManager.ToLower())
+            {
+                if (Team.managerExists(txtManager.Text.ToLower().Trim()))
                 {
-                    MessageBox.Show("This manager already exists in the Premier League!");
+                    MessageBox.Show("This manager already exists in the Premier League!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     txtManager.Focus();
                     return;
                 }
             }
 
+            if (!stadiumRegex.IsMatch(txtStadium.Text.ToLower().Trim()))
+            {
+                MessageBox.Show("Stadium contains invalid characters\n\nInput may only contain the following:" +
+                    "\nUppercase letters\nLowercase letters\nNumbers\nApostrophes", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtStadium.Focus();
+                return;
+            }
+
+            if (txtStadium.Text.Contains("  "))
+            {
+                MessageBox.Show("Stadium invalid - contains consecutive spaces!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtLocation.Focus();
+                return;
+            }
+
             if (string.IsNullOrEmpty(txtTeamName.Text) || string.IsNullOrEmpty(txtManager.Text) || string.IsNullOrEmpty(txtStadium.Text) || string.IsNullOrEmpty(txtStadiumCapacity.Text) || string.IsNullOrEmpty(txtLocation.Text))
             {
-                MessageBox.Show("Fields may not be left blank!");
+                MessageBox.Show("Fields may not be left blank!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             if (!Team.isNumeric(txtStadiumCapacity.Text))
             {
-                MessageBox.Show("Stadium capacity must be numeric.");
+                MessageBox.Show("Stadium capacity must be numeric.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 txtStadiumCapacity.Focus();
                 return;
             }
 
             if (Int32.Parse(txtStadiumCapacity.Text) < 5000)
             {
-                MessageBox.Show("Stadium capacity must be at least 5000 to meet Premier League regulations.");
+                MessageBox.Show("Stadium capacity must be at least 5000 to meet Premier League regulations.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 txtStadiumCapacity.Focus();
                 return;
             }
 
+            if (!locationRegex.IsMatch(txtLocation.Text.ToLower().Trim()))
+            {
+                MessageBox.Show("Location contains invalid characters\n\nInput may only contain the following:" +
+                    "\nUppercase letters\nLowercase letters\nNumbers\nCommas\nApostrophes", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtLocation.Focus();
+                return;
+            }
+
+            if (txtLocation.Text.Contains("  "))
+            {
+                MessageBox.Show("Location invalid - contains consecutive spaces!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtLocation.Focus();
+                return;
+            }
+
+            DialogResult dialog1 = MessageBox.Show("Are you sure you wish to update " + cboSelectTeam.Text.Substring(6) + "'s details?", "Confirm",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question); ;
+
             if (dialog1 == DialogResult.Yes)
             {
+                t.manager = txtManager.Text.Trim();
+                t.stadium = txtStadium.Text.Trim();
+                t.capacity = Convert.ToInt32(txtStadiumCapacity.Text);
+                t.location = txtLocation.Text.Trim();
+
                 try
                 {
-                    t.manager = txtManager.Text;
-                    t.stadium = txtStadium.Text;
-                    t.capacity = Convert.ToInt32(txtStadiumCapacity.Text);
-                    t.location = txtLocation.Text;
                     t.updateTeam();
-
-                    TextBox[] boxes = { txtTeamName, txtManager, txtStadium, txtStadiumCapacity, txtLocation };
-                    Label[] labels = { lblTeamName, lblManager, lblStadium, lblStadiumCapacity, lblLocation };
-
-                    for (int i = 0; i < labels.Length; i++)
-                    {
-                        labels[i].Hide();
-                        boxes[i].Hide();
-                        boxes[i].Clear();
-                    }
                 }
                 catch
                 {
-                    MessageBox.Show("Error encountered.");
+                    MessageBox.Show("Error encountered\n\nReturning to main menu", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    this.Close();
+                    parent.Visible = true;
                 }
+
+                TextBox[] boxes = { txtTeamName, txtManager, txtStadium, txtStadiumCapacity, txtLocation };
+                Label[] labels = { lblTeamName, lblManager, lblStadium, lblStadiumCapacity, lblLocation };
+
+                for (int i = 0; i < labels.Length; i++)
+                {
+                    labels[i].Hide();
+                    boxes[i].Hide();
+                    boxes[i].Clear();
+                }
+
+                cboSelectTeam.SelectedIndex = -1;
             }
         }
 
@@ -173,6 +195,27 @@ namespace PremierLeagueSYS
             {
                 e.Handled = true;
             }
+        }
+
+        private void mnuBack_Click(object sender, EventArgs e)
+        {
+            DialogResult dialog1 = MessageBox.Show("Are you sure you wish to return to the main menu?", "Confirm",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (dialog1 == DialogResult.Yes)
+            {
+                this.Close();
+                parent.Visible = true;
+            }
+        }
+
+        private void mnuExit_Click(object sender, EventArgs e)
+        {
+            DialogResult dialog1 = MessageBox.Show("Are you sure you want to exit?", "Confirm",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (dialog1 == DialogResult.Yes)
+                Application.Exit();
         }
     }
 }

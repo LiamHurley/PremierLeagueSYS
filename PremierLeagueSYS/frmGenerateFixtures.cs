@@ -42,8 +42,10 @@ namespace PremierLeagueSYS
         {
             if (Fixture.fixturesExist())
             {
-                MessageBox.Show("Fixtures for the season have already been generated!", "Fixtures", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Application.Exit();
+                MessageBox.Show("Fixtures for the season have already been generated!\n\nReturning to main menu.", "Fixtures", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+                parent.Visible = true; 
+                return;
             }
             
             DialogResult dialog1 = MessageBox.Show("Are you sure you wish to generate fixtures for the Premier League?", "Confirm",
@@ -51,18 +53,10 @@ namespace PremierLeagueSYS
 
             if (dialog1 == DialogResult.Yes)
             {
-                Fixture.generate();
-            }
-        }
-
-        private void mnuExit_Click(object sender, EventArgs e)
-        {
-            DialogResult dialog1 = MessageBox.Show("Are you sure you want to exit?", "Confirm",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-            if (dialog1 == DialogResult.Yes)
-            {
-                Application.Exit();
+                Fixture.generate(); 
+                
+                MessageBox.Show("Fixtures for the Premier League have been successfully generated! \n\nYou are now able to schedule fixtures!" +
+                    "\n\nReturning to main menu.");
                 this.Close();
                 parent.Visible = true;
             }
@@ -75,6 +69,19 @@ namespace PremierLeagueSYS
 
             if (dialog1 == DialogResult.Yes)
             {
+                this.Close();
+                parent.Visible = true;
+            }
+        }
+
+        private void mnuExit_Click(object sender, EventArgs e)
+        {
+            DialogResult dialog1 = MessageBox.Show("Are you sure you want to exit?", "Confirm",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (dialog1 == DialogResult.Yes)
+            {
+                Application.Exit();
                 this.Close();
                 parent.Visible = true;
             }

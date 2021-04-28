@@ -32,6 +32,8 @@ namespace PremierLeagueSYS
             if(dialog1 != DialogResult.Yes)
                 return;
 
+            lblGenerate.Hide();
+
             DataTable dt = new DataTable();
             dt.Columns.Add("Position", typeof(Int32));
             dt.Columns["Position"].AutoIncrement = true;

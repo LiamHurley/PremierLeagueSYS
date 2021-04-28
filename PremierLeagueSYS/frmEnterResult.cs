@@ -30,54 +30,38 @@ namespace PremierLeagueSYS
         {
             if (!Fixture.fixturesExist())
             {
-                MessageBox.Show("Fixtures for the new season have not yet been generated!\n\nReturning to main menu.");
+                MessageBox.Show("Fixtures for the new season have not yet been generated!\n\nReturning to main menu.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.Close();
                 parent.Visible = true;
             }
 
-            DataTable teamsList = Team.getTeams();
-
-            for (int i = 0; i < teamsList.Rows.Count; i++)
-            {
-                cboSelectTeam.Items.Add(teamsList.Rows[i]["NAME"].ToString());
-            }
+            Team.loadTeams(cboSelectTeam);
         }
         
         private void cboSelectTeam_SelectedValueChanged(object sender, EventArgs e)
         {
             cboSelectFixture.Items.Clear();
-            String selectedTeam = cboSelectTeam.SelectedItem.ToString();
-            int id = Team.getTeamId(selectedTeam);
-            DataTable dt = Fixture.getFixtures(id);
 
-            foreach (DataRow dr in dt.Rows)
-                cboSelectFixture.Items.Add(Convert.ToInt32(dr["FIX_ID"]).ToString("000") + " - " + dr["HomeTeam"].ToString() + " vs " + dr["AwayTeam"].ToString());
+            if(cboSelectTeam.SelectedIndex==-1)
+                return;
+            
+            DataTable dt = Fixture.getUnplayedFixtures(Convert.ToInt32(Utility.deformatId(cboSelectTeam.Text.Substring(0, 3))));
+
+            Fixture.loadFixtures(dt,cboSelectFixture);
         }
 
         private void btnSelectFixture_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(cboSelectTeam.Text) || string.IsNullOrEmpty(cboSelectFixture.Text))
             {
-                MessageBox.Show("You must select a team and a fixture to proceed.");
+                MessageBox.Show("You must select a team and a fixture to proceed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            String idStr = cboSelectFixture.Text.Substring(0, 3);
-
-            if(idStr.Substring(0,2).Equals("00"))
+            if (!Fixture.isGamePlayed(Convert.ToInt32(Utility.deformatId(cboSelectFixture.Text.Substring(0, 3)))))
             {
-                idStr = idStr.Remove(0, 2);
-            }
-            else if(idStr[0]=='0' && idStr[1]!='0')
-            {
-                idStr = idStr.Remove(0, 1);
-            }
-            
-            int id = Convert.ToInt32(idStr);
-
-            if (!Fixture.isGamePlayed(id))
-            {
-                MessageBox.Show("You may not enter a result for a game that has not yet been played!");
+                MessageBox.Show("You may not enter a result for a game that has not yet been played!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                cboSelectFixture.SelectedIndex = -1;
                 return;
             }
 
@@ -99,26 +83,26 @@ namespace PremierLeagueSYS
 
         private void btnSubmitResult_Click(object sender, EventArgs e)
         {
-            // isNumber method https://stackoverflow.com/a/894271
+            // isNumber code https://stackoverflow.com/a/894271
 
             Boolean isNumberHome = int.TryParse(txtHomeGoals.Text, out int homeGoalsParsed);
             Boolean isNumberAway = int.TryParse(txtAwayGoals.Text, out int awayGoalsParsed);
 
             if (string.IsNullOrEmpty(txtHomeGoals.Text) || string.IsNullOrEmpty(txtAwayGoals.Text))
             {
-                MessageBox.Show("Fields cannot be left blank!");
+                MessageBox.Show("Fields cannot be left blank!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             if (!isNumberHome || !isNumberAway)
             {
-                MessageBox.Show("Values must be whole numbers.");
+                MessageBox.Show("Values must be whole numbers.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             if(homeGoalsParsed < 0 || homeGoalsParsed > 12 || awayGoalsParsed < 0 || awayGoalsParsed > 12)
             {
-                MessageBox.Show("Values must be between 0 and 12 inclusive.");
+                MessageBox.Show("Values must be between 0 and 12 inclusive.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -127,6 +111,12 @@ namespace PremierLeagueSYS
                 f.id = Convert.ToInt32(cboSelectFixture.Text.Substring(0,3));
                 f.homeGoals = homeGoalsParsed;
                 f.awayGoals = awayGoalsParsed;
+
+                DialogResult dialog1 = MessageBox.Show("Are you sure this is the correct fixture and result?\n\n" + cboSelectFixture.Text.Substring(6) + "\n" + 
+                    homeGoalsParsed + "-" + awayGoalsParsed,"Confirm",MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (dialog1 != DialogResult.Yes)
+                    return;
 
                 f.updateResult();
 
@@ -142,6 +132,7 @@ namespace PremierLeagueSYS
                 txtAwayGoals.Clear();
                 btnSubmitResult.Hide();
                 btnSelectFixture.Show();
+                cboSelectTeam.SelectedIndex = -1;
                 cboSelectFixture.Items.Remove(cboSelectFixture.SelectedItem);
                 cboSelectTeam.Enabled = true;
                 cboSelectFixture.Enabled = true;
@@ -151,7 +142,7 @@ namespace PremierLeagueSYS
         private void mnuBack_Click(object sender, EventArgs e)
         {
             DialogResult dialog1 = MessageBox.Show("Are you sure you wish to return to the main menu?", "Confirm",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                 MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (dialog1 == DialogResult.Yes)
             {
@@ -163,7 +154,7 @@ namespace PremierLeagueSYS
         private void mnuExit_Click(object sender, EventArgs e)
         {
             DialogResult dialog1 = MessageBox.Show("Are you sure you want to exit?", "Confirm",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                 MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (dialog1 == DialogResult.Yes)
                 Application.Exit();
