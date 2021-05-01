@@ -35,6 +35,7 @@ namespace PremierLeagueSYS
                 MessageBox.Show("Fixtures for the new season have not yet been generated!\n\nReturning to main menu.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.Close();
                 parent.Visible = true;
+                return;
             }
 
             startYear = Team.getLastYear();
@@ -134,7 +135,8 @@ namespace PremierLeagueSYS
 
             f.schedule();
 
-            MessageBox.Show("You have successfully rescheduled Match No #" + cboSelectFixture.Text.Substring(0, 3) + " to be played on:\n\nDate: " + dtpFixDate.Text + "\nTime: " + cboTimes.Text);
+            MessageBox.Show("You have successfully rescheduled Match No #" + cboSelectFixture.Text.Substring(0, 3) + 
+                " to be played on:\n\nDate: " + dtpFixDate.Text + "\nTime: " + cboTimes.Text);
 
             lblFixDate.Hide();
             lblFixTime.Hide();

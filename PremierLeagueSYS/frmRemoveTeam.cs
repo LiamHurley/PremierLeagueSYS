@@ -28,19 +28,20 @@ namespace PremierLeagueSYS
 
         private void frmRemoveTeam_Load(object sender, EventArgs e)
         {
-            Team.loadTeams(cboTeams); 
-        }
-
-        private void btnRemoveTeam_Click(object sender, EventArgs e)
-        {
             if (Fixture.fixturesExist())
             {
                 MessageBox.Show("You may not remove a team after fixtures have been generated for the season.\n\nReturning to the main menu."
                     , "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.Close();
                 parent.Visible = true;
+                return;
             }
 
+            Team.loadTeams(cboTeams); 
+        }
+
+        private void btnRemoveTeam_Click(object sender, EventArgs e)
+        {
             if (string.IsNullOrEmpty(cboTeams.Text))
             {
                 MessageBox.Show("Please select a team.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);

@@ -31,7 +31,7 @@ namespace PremierLeagueSYS
 
             if(seasons.Rows.Count==0)
             {
-                MessageBox.Show("No previous seasons were found.\n\nReturning to the main menu.");
+                MessageBox.Show("No previous seasons were found.\n\nReturning to the main menu.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.Close();
                 parent.Visible = true;
                 return;

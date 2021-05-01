@@ -22,7 +22,7 @@ namespace PremierLeagueSYS
         public frmNewSeason(frmMainMenu Parent)
         {
             InitializeComponent();
-            parent=Parent;
+            parent = Parent;
         }
 
         private void frmNewSeason_Load(object sender, EventArgs e)
@@ -32,6 +32,7 @@ namespace PremierLeagueSYS
                 MessageBox.Show("You may not start a new season whilst one is currently in progress.\n\nReturning to main menu.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.Close();
                 parent.Visible = true;
+                return;
             }
 
             if (!Fixture.hasTimeElapsed())
@@ -39,7 +40,6 @@ namespace PremierLeagueSYS
                 MessageBox.Show("You may not start a new season so soon after the current one has ended.\n\nReturning to main menu.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.Close();
                 parent.Visible = true;
-                return;
             }
         }
 
@@ -57,21 +57,25 @@ namespace PremierLeagueSYS
                 
             DataTable table = Team.sortTable();
 
-            List<int> relegatedIds = new List<int>();
+            List<int> relegatedIds = Team.findBottomThree(table);
 
-            //method?
-            for(int i = table.Rows.Count-1; i >= table.Rows.Count-3; i--)
+            try
             {
-                relegatedIds.Add(Convert.ToInt32(table.Rows[i]["TEAM_ID"]));
+                Fixture.clear();
+
+                Team.relegate(relegatedIds);
+
+                Team.getRemainingIds(); //call to renumber() method inside getRemainingIds()
+
+                Team.resetStats();
             }
-
-            Fixture.clear();
-
-            Team.relegate(relegatedIds);
-
-            Team.getRemainingIds(); //call to renumber() method inside getRemainingIds()
-
-            Team.resetStats();
+            catch
+            {
+                MessageBox.Show("Error encountered whilst trying to create new season.\n\nReturning to main menu.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+                parent.Visible = true;
+                return;
+            }
 
             MessageBox.Show("New season successfully created.\n\nThe new season will commence in August "+endYear+".\n\nApplication will now return to the main menu.");
             this.Close();

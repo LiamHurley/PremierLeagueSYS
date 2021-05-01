@@ -35,6 +35,7 @@ namespace PremierLeagueSYS
                 MessageBox.Show("Fixtures for the new season have not yet been generated!\n\nReturning to main menu.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.Close();
                 parent.Visible = true;
+                return;
             }
 
             startYear = Team.getLastYear();

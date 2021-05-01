@@ -28,32 +28,42 @@ namespace PremierLeagueSYS
 
         private void frmGenerateFixtures_Load(object sender, EventArgs e)
         {
-            /*int teams = Team.countTeams();
-            
-            if (teams != 20)
-            {
-                MessageBox.Show("There are currently only " + teams + " teams in the Premier League.  There must be exactly 20 teams before fixtures may be generated." +
-                    "\n\nPlease add " + (20-teams) + " more teams and try again.");
-                Application.Exit();
-            }*/
-        }
-
-        private void btnGenFixtures_Click(object sender, EventArgs e)
-        {
             if (Fixture.fixturesExist())
             {
                 MessageBox.Show("Fixtures for the season have already been generated!\n\nReturning to main menu.", "Fixtures", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.Close();
-                parent.Visible = true; 
+                parent.Visible = true;
                 return;
             }
+
+            int teams = Team.countTeams();
             
+            if (teams != 6)
+            {
+                MessageBox.Show("There are currently only " + teams + " teams in the Premier League.  There must be exactly 6 teams before fixtures may be generated." +
+                    "\n\nPlease add " + (6-teams) + " more teams and try again.\n\nNow returning to main menu.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+                parent.Visible = true;
+            }
+        }
+
+        private void btnGenFixtures_Click(object sender, EventArgs e)
+        {
             DialogResult dialog1 = MessageBox.Show("Are you sure you wish to generate fixtures for the Premier League?", "Confirm",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (dialog1 == DialogResult.Yes)
             {
-                Fixture.generate(); 
+                try
+                {
+                    Fixture.generate();
+                }
+                catch
+                {
+                    MessageBox.Show("Error encountered while attempting to generate fixtures.\n\nApplication will now return to the main menu", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    this.Close();
+                    parent.Visible = true;
+                }
                 
                 MessageBox.Show("Fixtures for the Premier League have been successfully generated! \n\nYou are now able to schedule fixtures!" +
                     "\n\nReturning to main menu.");

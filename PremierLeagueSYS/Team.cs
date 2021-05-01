@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
 
 namespace PremierLeagueSYS
 {
@@ -773,6 +774,18 @@ namespace PremierLeagueSYS
                 profile.Rows.Add("Points Per Game", "0");
 
             profile.Rows.Add("Clean Sheets", dt.Rows[0]["CleanSheets"]);
+        }
+
+        public static List<int> findBottomThree(DataTable table)
+        {
+            List<int> ids = new List<int>();
+            
+            for (int i = table.Rows.Count - 1; i >= table.Rows.Count - 3; i--)
+            {
+                ids.Add(Convert.ToInt32(table.Rows[i]["TEAM_ID"]));
+            }
+
+            return ids;
         }
     }
 }
