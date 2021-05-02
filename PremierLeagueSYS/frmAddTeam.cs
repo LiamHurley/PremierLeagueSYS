@@ -21,15 +21,15 @@ namespace PremierLeagueSYS
 
         private void frmAddTeam_Load(object sender, EventArgs e)
         {
-            /*if(Fixture.fixturesExist())
+            if(Fixture.fixturesExist())
             {
                 MessageBox.Show("You may not add a team after fixtures have been generated!\n\nReturning to main menu.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.Close();
                 parent.Visible = true;
                 return;
-            }*/
+            }
             
-            if (Team.countTeams() == 7)
+            if (Team.countTeams() == 6)
             {
                 MessageBox.Show("You may not add a team when there are already 6 teams in the league!\n\nReturning to main menu.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.Close();
