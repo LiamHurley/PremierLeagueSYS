@@ -1,18 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Oracle.ManagedDataAccess.Client;
 
 namespace PremierLeagueSYS
 {
-     public partial class frmAddTeam : Form
+    public partial class frmAddTeam : Form
     {
         private frmMainMenu parent;
         
@@ -29,15 +21,15 @@ namespace PremierLeagueSYS
 
         private void frmAddTeam_Load(object sender, EventArgs e)
         {
-            if(Fixture.fixturesExist())
+            /*if(Fixture.fixturesExist())
             {
                 MessageBox.Show("You may not add a team after fixtures have been generated!\n\nReturning to main menu.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.Close();
                 parent.Visible = true;
                 return;
-            }
+            }*/
             
-            if (Team.countTeams() == 6)
+            if (Team.countTeams() == 7)
             {
                 MessageBox.Show("You may not add a team when there are already 6 teams in the league!\n\nReturning to main menu.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.Close();
@@ -47,12 +39,7 @@ namespace PremierLeagueSYS
 
         private void btnAddTeam_Click(object sender, EventArgs e)
         {
-            //learned how to use Regex here https://stackoverflow.com/a/336220
-            var teamRegex = new Regex("^[A-Za-z0-9 ]+$");
-            var managerRegex = new Regex("^[A-Za-z' ]+$");
-            var stadiumRegex = new Regex("^[A-Za-z0-9' ]+$");
-            var locationRegex = new Regex("^[A-Za-z0-9', ]+$");
-
+            
             if (txtTeamName.Text.Contains("  "))
             {
                 MessageBox.Show("Team Name invalid - contains consecutive spaces!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -60,9 +47,9 @@ namespace PremierLeagueSYS
                 return;
             }
 
-            if (!teamRegex.IsMatch(txtTeamName.Text.ToLower().Trim()))
+            if (!Team.isValidTeamName(txtTeamName.Text.ToLower().Trim()))
             {
-                MessageBox.Show("Team Name contains invalid characters\n\nInput may only contain the following:" +
+                MessageBox.Show("Team Name contains invalid characters!\n\nInput may only contain the following:" +
                     "\nUppercase letters\nLowercase letters\nNumbers", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 txtTeamName.Focus();
                 return;
@@ -82,10 +69,10 @@ namespace PremierLeagueSYS
                 return;
             }
 
-            if (!managerRegex.IsMatch(txtManager.Text.ToLower().Trim()))
+            if (!Team.isValidManager(txtManager.Text.ToLower().Trim()))
             {
                 MessageBox.Show("Manager Name contains invalid characters\n\nInput may only contain the following:" +
-                    "\nUppercase letters\nLowercase letters\nApostrophes", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                   "\nUppercase letters\nLowercase letters\nApostrophes", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 txtManager.Focus();
                 return;
             }
@@ -97,7 +84,7 @@ namespace PremierLeagueSYS
                 return;
             }
 
-            if (!stadiumRegex.IsMatch(txtStadium.Text.ToLower().Trim()))
+            if (!Team.isValidStadium(txtStadium.Text.ToLower().Trim()))
             {
                 MessageBox.Show("Stadium contains invalid characters\n\nInput may only contain the following:" +
                     "\nUppercase letters\nLowercase letters\nNumbers\nApostrophes", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -113,8 +100,8 @@ namespace PremierLeagueSYS
             }
 
             if (string.IsNullOrEmpty(txtTeamName.Text) || string.IsNullOrEmpty(txtManager.Text) || string.IsNullOrEmpty(txtStadium.Text) || 
-                string.IsNullOrEmpty(txtStadiumCapacity.Text) || string.IsNullOrEmpty(txtLocation.Text))
-            {
+                string.IsNullOrEmpty(txtStadiumCapacity.Text) || string.IsNullOrEmpty(txtLocation.Text)){
+                
                 MessageBox.Show("Fields may not be left blank!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
@@ -133,7 +120,7 @@ namespace PremierLeagueSYS
                 return;
             }
 
-            if (!locationRegex.IsMatch(txtLocation.Text.ToLower().Trim()))
+            if (!Team.isValidLocation(txtLocation.Text.ToLower().Trim()))
             {
                 MessageBox.Show("Location contains invalid characters\n\nInput may only contain the following:" +
                     "\nUppercase letters\nLowercase letters\nNumbers\nCommas\nApostrophes", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);

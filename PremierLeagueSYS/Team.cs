@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
 using System.Windows.Forms;
@@ -786,6 +783,47 @@ namespace PremierLeagueSYS
             }
 
             return ids;
+        }
+
+        //learned how to use Regex here https://stackoverflow.com/a/336220
+        public static bool isValidTeamName(String text)
+        {
+            var regex = new Regex("^[A-Za-z0-9 ]+$");
+
+            if (!regex.IsMatch(text))
+                return false;
+
+            return true; 
+        }
+
+        public static bool isValidManager(String text)
+        {
+            var regex = new Regex("^[A-Za-z' ]+$");
+
+            if (!regex.IsMatch(text))
+                return false;
+
+            return true;
+        }
+
+        public static bool isValidLocation(String text)
+        {
+            var regex = new Regex("^[A-Za-z0-9', ]+$");
+            
+            if (!regex.IsMatch(text))
+                return false;
+
+            return true;
+        }
+
+        public static bool isValidStadium(String text)
+        {
+            var regex = new Regex("^[A-Za-z0-9' ]+$");
+            
+            if (!regex.IsMatch(text))
+                return false;
+
+            return true;
         }
     }
 }

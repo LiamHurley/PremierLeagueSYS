@@ -1,12 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace PremierLeagueSYS
@@ -61,26 +54,21 @@ namespace PremierLeagueSYS
 
         private void btnEditTeam_Click(object sender, EventArgs e)
         {
-            //learned how to use Regex here https://stackoverflow.com/a/336220
-            var managerRegex = new Regex("^[A-Za-z' ]+$");
-            var stadiumRegex = new Regex("^[A-Za-z0-9' ]+$");
-            var locationRegex = new Regex("^[A-Za-z0-9', ]+$");
-
             if (string.IsNullOrEmpty(cboSelectTeam.Text))
             {
                 MessageBox.Show("Please select a team.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            if (!managerRegex.IsMatch(txtManager.Text.ToLower().Trim()))
+            if (!Team.isValidManager(txtManager.Text.ToLower().Trim()))
             {
                 MessageBox.Show("Manager Name contains invalid characters\n\nInput may only contain the following:" +
-                    "\nUppercase letters\nLowercase letters\nApostrophes", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                   "\nUppercase letters\nLowercase letters\nApostrophes", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 txtManager.Focus();
                 return;
             }
 
-            if(txtManager.Text.Contains("  "))
+            if (txtManager.Text.Contains("  "))
             {
                 MessageBox.Show("Manager Name invalid - contains consecutive spaces!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 txtManager.Focus();
@@ -97,7 +85,7 @@ namespace PremierLeagueSYS
                 }
             }
 
-            if (!stadiumRegex.IsMatch(txtStadium.Text.ToLower().Trim()))
+            if (!Team.isValidStadium(txtStadium.Text.ToLower().Trim()))
             {
                 MessageBox.Show("Stadium contains invalid characters\n\nInput may only contain the following:" +
                     "\nUppercase letters\nLowercase letters\nNumbers\nApostrophes", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -132,7 +120,7 @@ namespace PremierLeagueSYS
                 return;
             }
 
-            if (!locationRegex.IsMatch(txtLocation.Text.ToLower().Trim()))
+            if (!Team.isValidLocation(txtLocation.Text.ToLower().Trim()))
             {
                 MessageBox.Show("Location contains invalid characters\n\nInput may only contain the following:" +
                     "\nUppercase letters\nLowercase letters\nNumbers\nCommas\nApostrophes", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
